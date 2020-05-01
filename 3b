@@ -1,1 +1,578 @@
 
+<!DOCTYPE>
+<html>
+<head>
+<style>
+html,
+body {
+padding: 2%;
+font-size: 18px;
+}
+li {
+list-style-type: none;
+}
+a[src] {
+text-decoration: none;
+position: relative;
+display: inline-block;
+color: #B523FF;
+cursor: pointer;
+overflow: hidden;/* ':hidden' or ':auto' steadies the link so it doesn't bob and move the other links with it */
+}
+a[src]::before {
+content: "\25ba";
+position: relative;
+color: black;
+margin-right: 0.3rem;
+}
+a[src]:hover {
+color: #FF5EDC;
+}
+a[src].visited {   /* .visited and .current do not need the [src] attribute */
+color: #C5A1CC;
+}
+a[src].visited:hover {
+color: #FF5EDC;
+}
+a[src].visited:active {
+color: #FF00C7;
+}
+a[src].current {  /* .visited and .current do not need the [src] attribute */
+color: #2794bb;
+font-weight: 500;
+position: relative;
+}
+a[src].current:hover {
+color: #2794bb;
+}
+a[src].current::before {
+display: none;
+}
+a[src]:active {
+color: #BC0093;
+}
+#audioPlayer {
+margin: 0 0 0.3rem 1.3rem;
+height: 1.6rem;
+}
+#playButton {
+cursor: pointer;
+position: relative;
+display: inline-block;
+width: 1.3rem;
+bottom: 0.24rem;
+}
+#playButton.play::before {
+content: "\25ba";
+position: relative;
+color: black;
+}
+#playButton.pause::before {
+content: '\275a\275a';
+letter-spacing: -0.4px;
+position: relative;
+color: black;
+font-size: 0.965rem;
+}
+#progress {
+display: flex;
+flex: 10;
+flex-basis: 100%;
+transition: height 0.3s;
+width: 7.2rem;
+height: 0.44rem;
+background: #bbb;
+cursor: pointer;
+}
+#progress::after {
+position: relative;
+content: '\2588';
+background: rgba(0, 0, 0, 1);
+font-size: 0.67rem;
+display: flex;
+align-self: center;
+}
+.filled-progress {
+  background: #69B4E0;
+  flex: 0;
+  flex-basis: 0%;
+}
+#bottom-wrapper {
+  display: flex;
+  align-items: baseline;
+}
+#song-timer,
+#loopButton {
+margin-right: 0.6rem;
+}
+#song-timer {
+font-size: 0.85rem;
+}
+#loopButton {
+cursor: pointer;
+position: relative;
+font-size: 0.8rem;
+}
+#loopButton::before {
+position: relative;
+content: '\1f501\FE0E';
+}
+.isNotLooped:hover::after {
+  content: "loop";
+}
+#loopButton.isLooped::before{
+position: relative;
+font-size: 95%;
+border: 0.156rem inset #f0f0f0;   /* 2.5px */
+margin-left: -0.18rem;
+margin-right: -0.215rem;
+padding: 0 1px;
+}
+.isLooped:hover::after {
+  content: "unloop";
+}
+#volumeWrap {
+cursor: pointer;
+font-size: 1.2rem;
+position: relative;
+display: flex;
+align-items: center;
+height: 1rem;
+top: 0.115em;
+}
+#volumeMute {
+position: relative;
+width: 1.2rem;
+margin-right: -0.3rem;
+}
+.isFull::before {
+content: '\1F50A\FE0E';
+bottom: 1%;
+}
+.isLittle::before {
+content: '\1F508\FE0E';
+position: relative;
+left: 5%;
+}
+.isLittle::after {
+content: '\1f5e7';
+font-size: 0.75rem;
+font-weight: bold;
+position: absolute;
+top: 0.26rem;
+/* content: '\25d7';
+font-size: 0.62rem;
+position: absolute;
+right: 23%;
+top: 0.42rem; */
+/* content: '\269f';
+font-size: 0.6rem;
+font-weight: bold;
+position: absolute;
+top: 0.33rem;
+right: 10%; */
+}
+.isLess::before {
+content: '\1F509\FE0E';
+position: relative;
+right: 12.7%;
+}
+.isNone::before {
+content: '\1F508\FE0E';
+position: relative;
+left: 5%;
+}
+.isMuted::before {
+content: '\1F508\FE0E';
+position: relative;
+left: 0.06rem;
+}
+.isMuted::after {
+content: '\ff3c';
+position: absolute;
+font-size: 0.9rem;
+font-weight: bold;
+right: 0.4rem;    /* big slash */
+color: red;
+top: 0.3rem;
+}
+#volumePanel {
+  position: relative;
+  float: left;
+  overflow: hidden;
+  transition: width 0.15s;
+  cursor: pointer;
+}
+.volume-show #volumePanel { /* volume-show makes track open and close */
+  width: 3.3125rem;
+}
+#volumeSlider {
+  position: relative;
+  height: 100%;
+}
+#volume-slider-track {
+  height: 0.25rem;
+  width: 3rem;
+  position: absolute;
+  top: 50%;
+  right: 0;
+  background: gray;
+}
+#volumeProgress {
+  height: 100%;
+  background: #69B4E0;
+  position: relative;
+}
+#volume-slider-handle {
+width: 0.375rem;
+height: 0.77rem;
+  position: absolute;
+  -webkit-transform: perspective(1px) translateY(-35%);
+  -moz-transform: perspective(1px) translateY(-35%);
+  -0-transform: perspective(1px) translateY(-35%);
+  -ms-transform: perspective(1px) translateY(-35%);
+  right: 0;
+  background: black;
+}
+a[src]:hover::before,
+#playButton:hover::before,
+#progress:hover::after,
+#loopButton:hover::before,
+#volumeMute:hover::before {
+color: #707070;
+}
+#volume-slider-handle:hover {
+background-color: #707070;
+}
+a[src]:active::before, 
+#playButton:active::before,
+.play:active::before,
+#progress:active::after,
+#loopButton:active::before,
+#volumeMute:active::before {
+color: #000000;
+}
+#volume-slider-handle:active {
+background-color: #000000;
+}
+#volumeMute.isFull:hover::after,
+#volumeMute.isLess:hover::after,
+#volumeMute.isLittle:hover::after {
+content: 'mute';
+width: 1.7rem;
+}
+#volumeMute.isMuted:hover::after {
+content: 'unmute';
+width: 2.5rem;
+}
+#volumeMute:hover::after,
+#loopButton:hover::after {
+  position: absolute;
+top: -1.1rem;
+left: -0.3rem;
+font-size: 0.85rem;
+font-weight: normal;
+color: black;
+  z-index: 1;
+  padding: 0 2px;
+  background-color: white;
+  border: 0.03em solid #666;
+white-space: nowrap;
+-moz-border-radius: 0.125em;
+-webkit-border-radius: 0.125em;
+-ms-border-radius: 0.125em;
+-o-border-radius: 0.125em;
+border-radius: 0.125em;        /* 2px of font-size 16px (1/8th)  */
+}
+</style>
+</head>
+<body>
+<div>I blah blah I blah blah I blah blah I blah blah I blah blah I blah blah I blah blah I blah blah I blah blah I blah blah I blah blah I blah blah I blah blah <p><a src='http://iandevlin.com/html5/media-player/parrots.webm'>Parrots</a></p>I blah blah I blah blah I blah blah I blah</div>
+
+<div><a src='http://archive.org/download/Wimpy_575/Chan_12_Love_Story__Susie_Meets_Anthony-13.mp3'>Love Theme</a></div>
+
+<p><a src='http://susiechansmusic.wordpress.com/files/2009/11/i-never-saw-another-butterfly-overture.mp3'>Butterfly</a></p>
+
+<li><a src='http://www.archive.org/download/SermonOnTheMount_927/BlessedAreThePoorInSpirit.mp3'>Sermon</a></li>
+
+<div><a src='http://www.archive.org/download/Wimpy_575/TheParagraph.mp3'>Paragraph</a></div>
+
+<p><a src='http://www.archive.org/download/Wimpy_575/Ephesians12.mp3'>Ephesians 1</a>
+
+<div id="audioPlayer">
+ <div id="progress">
+    <div class="filled-progress"></div>
+ </div>
+ <div id='bottom-wrapper'>
+  <div id='song-timer'>
+     <span class="current-time"></span>
+     <span>/</span>
+     <span class="duration"></span>
+  </div>
+  <div id='loopButton'></div>
+  <div id='volumeWrap'>
+   <div id='volumeMute'></div>
+    <div id='volumePanel'>
+     <div id='volumeSlider'>
+      <div id='volume-slider-track'>
+       <div id='volumeProgress'>
+        <div id='volume-slider-handle'></div>
+       </div>
+      </div>
+     </div>
+    </div>
+   </div>
+  </div>
+ </div>
+
+<script>
+var audio = document.createElement('audio');
+var audioPlayer = document.getElementById('audioPlayer'); // audioPlayer
+var loopButton = document.getElementById('loopButton'); // loop button
+var progress = document.getElementById('progress');
+var progressFilled = document.querySelector('.filled-progress');
+var playButton = document.createElement('div'); // play button
+playButton.setAttribute('id', 'playButton');
+
+audioPlayer.style.display = 'none';
+playButton.style.display = 'none';
+volumeMute.className = 'isFull';
+loopButton.className = 'isNotLooped';
+playButton.className = 'pause';
+
+    // Actions that happen when a link is clicked:
+var links = document.querySelectorAll('a[src]');
+var link = links;
+      for (var m = 0; m < links.length; m++) {
+      link[m].addEventListener('click', function() {
+   // Add the classes 'current' and 'visited' to the selected link:
+       var selected = document.getElementsByClassName('current');
+       if (selected.length > 0) { 
+       selected[0].className = selected[0].className.replace('current', '');
+  }   
+    this.className += 'visited current';
+
+   // A parent node encases the selected link. Call the node anything: li, div, p, 
+   // suffer, current, elephant--ANYTHING.
+    var li = this.parentNode;
+       li.insertBefore(playButton, li.firstChild);
+       li.appendChild(audioPlayer);       
+       audioPlayer.style.display = 'block';
+       playButton.style.display = 'inline-block';
+
+   // Get audio source from an <a src> tag:
+       var source = selected[0].getAttribute('src');
+       audio.src = source;
+       audio.play();
+   })
+  } // Actions are finished for the selected link.
+
+// At audio file's end, reset progress to the beginning. Optional: hide player and make // the link visited.
+audio.onended = function(){
+    progressFilled.style.flexBasis = '0' + '%';
+    document.querySelector('.current-time').innerHTML = '0:00';
+    playButton.className = 'play';
+//  document.querySelector('.current').className = 'visited';
+//  audioPlayer.style.display = 'none'; //Player folds up and disappears.
+   };
+// When another link is clicked, reset progress to the beginning.
+audio.onabort = function(){
+    playButton.className = 'pause';
+    progressFilled.style.flexBasis = '0' + '%';
+    document.querySelector('.current-time').innerHTML = '0:00';
+};
+// audio.onplaying = function(){
+//  playButton.className = 'pause';
+// };
+audio.addEventListener('playing', function() {
+    playButton.className = 'pause';
+});
+audio.addEventListener('timeupdate', progressUpdate);
+audio.addEventListener('loadedmetadata', function() {
+  var duration = audio.duration;
+  var currentTime = audio.currentTime;
+  document.querySelector('.duration').innerHTML = convertElapsedTime(duration);
+  document.querySelector('.current-time').innerHTML = convertElapsedTime(currentTime);
+});
+audio.addEventListener('timeupdate', function(){ 
+  var currentTime = audio.currentTime;
+  document.querySelector('.current-time').innerHTML = convertElapsedTime(currentTime);  
+});
+function convertElapsedTime(inputSeconds) {
+  var seconds = Math.floor(inputSeconds % 60);
+  if (seconds < 10) {
+    seconds = '0' + seconds;
+  }
+  var minutes = Math.floor(inputSeconds / 60);
+  return minutes + ':' + seconds;
+}
+playButton.addEventListener('click', function() {
+  var play = playButton.className === 'play'
+  var method
+  if (play) {
+    playButton.className = 'pause';
+    method = 'play'
+  } else {
+    playButton.className = 'play';
+    method = 'pause'
+  }
+  audio[method]()
+});
+function progressUpdate() {
+  var percent = audio.currentTime / audio.duration * 100;
+  progressFilled.style.flexBasis = percent + '%';
+}
+function scrub(e) {
+  var scrubTime = e.offsetX / progress.offsetWidth * audio.duration;
+  audio.currentTime = scrubTime;
+}
+  var mousedown = false;
+  progress.addEventListener('click', scrub);
+
+progress.addEventListener('mousemove', function (e) {
+  e.preventDefault();
+  return mousedown && scrub(e);
+});
+progress.addEventListener('mousedown', function (e) {
+  e.preventDefault();
+  scrub(e);
+  if (playButton.className === 'pause'){
+  audio.muted = true;
+  audio.pause();
+}
+  return mousedown = true;
+});
+
+document.addEventListener('mouseup', function () {
+  if ((playButton.className === 'pause') && (audio.muted = true)) {
+  audio.muted = false;
+  audio.play();
+} 
+  return mousedown = false;
+});
+loopButton.addEventListener('click', function() {
+     if(audio.loop) {
+        audio.loop = false;
+        loopButton.className = 'isNotLooped';
+      } else {
+        audio.loop = true;
+        loopButton.className = 'isLooped';
+      }
+    });
+var VolumeControl, control, getElementPercentage, bind = function (fn, me) {
+        return function () {
+        return fn.apply(me, arguments);
+        };
+    };
+getElementPercentage = function (click, elm) {
+    var rect;
+    rect = elm.getBoundingClientRect();
+    return (click.pageX - rect.left) / rect.width * 100;
+};
+VolumeControl = function () {
+    function VolumeControl() {
+        this.volumeMute = bind(this.volumeMute, this);
+        this.volumeStopHandler = bind(this.volumeStopHandler, this);
+        this.volumeMoveHandler = bind(this.volumeMoveHandler, this);
+        this.volumeDrag = bind(this.volumeDrag, this);
+        this.volumeClick = bind(this.volumeClick, this);
+        this.volumeHoverOut = bind(this.volumeHoverOut, this);
+        this.volumeHoverIn = bind(this.volumeHoverIn, this);
+        this.elm = {
+            volumeWrap: document.getElementById('volumeWrap'),
+            volumeMute: document.getElementById('volumeMute'),
+            volumeSlider: document.getElementById('volumeSlider'),
+            sliderHandle: document.getElementById('volume-slider-handle'),
+            volumeProgress: document.getElementById('volumeProgress')
+        };
+        volumeWrap.addEventListener('mouseenter', this.volumeHoverIn);
+        volumeWrap.addEventListener('mouseleave', this.volumeHoverOut);
+        volumeSlider.addEventListener('click', this.volumeClick);
+        volumeSlider.addEventListener('mousedown', this.volumeDrag);
+        volumeMute.addEventListener('click', this.volumeMute);
+    }
+    VolumeControl.prototype.volumeHoverIn = function (e) {
+        if (this.volumeHoverTimout) {
+            clearTimeout(this.volumeHoverTimout);
+        }
+        return volumeWrap.classList.add('volume-show');
+    };
+    VolumeControl.prototype.volumeHoverOut = function (e) {
+        return this.volumeHoverTimout = setTimeout(function (_this) {
+            return function () {
+                return volumeWrap.classList.remove('volume-show');
+            };
+        }(this), 300);
+    };
+    VolumeControl.prototype.volumeClick = function (e) {
+        var percent = getElementPercentage(e, volumeSlider);
+        if (percent <= 0) {
+            percent = 0;
+        volumeMute.className = 'isMuted';
+        } else if (percent > 100) {
+            percent = 100;
+        } else if (percent > 66) {
+        volumeMute.className = 'isFull';
+        } else if ((percent > 33) && (percent <= 66)) {
+        volumeMute.className = 'isLittle';
+        }  else if ((percent > 0) && (percent <= 33)) {
+        volumeMute.className = 'isLess';
+        }       
+        return this.volumeSet(percent);
+    };
+    VolumeControl.prototype.volumeSet = function (percent) {
+        volumeProgress.style.width = percent + '%';
+        return this.lastVolume = audio.volume = percent / 100;       
+    };
+    VolumeControl.prototype.volumeDrag = function (e) {
+        e.preventDefault();
+        document.addEventListener('mousemove', this.volumeMoveHandler);
+        return document.addEventListener('mouseup', this.volumeStopHandler);
+    };
+    VolumeControl.prototype.volumeMoveHandler = function (e) {
+        var percent = getElementPercentage(e, volumeSlider);
+        if (percent <= 0) {
+            percent = 0;
+        volumeMute.className = 'isMuted';
+        } else if (percent > 100) {
+            percent = 100;
+        } else if (percent > 66) {
+        volumeMute.className = 'isFull';
+        } else if ((percent > 33) && (percent <= 66)) {
+        volumeMute.className = 'isLittle';
+        }  else if ((percent > 0) && (percent <= 33)) {
+        volumeMute.className = 'isLess';
+        }       
+        return this.volumeSet(percent);
+    };
+    VolumeControl.prototype.volumeStopHandler = function (e) {
+        document.removeEventListener('mousemove', this.volumeMoveHandler);
+        return document.removeEventListener('mouseup', this.volumeStopHandler);
+    };
+    VolumeControl.prototype.volumeMute = function () { 
+        var vol = audio.volume > 0 ? 0 : this.lastVolume || 1;
+        audio.volume = vol;
+        var volWidth = volumeProgress.style.width = vol * 100;
+        var newWidth = volumeProgress.style.width = volWidth + '%';
+
+        if (vol) {
+          if (volWidth <= 33) {
+          volumeMute.className = 'isLess';
+          } else if (volWidth > 66) {
+          volumeMute.className = 'isFull';
+          } else {
+          volumeMute.className = 'isLittle';
+          } 
+        } else {
+        volumeMute.className = 'isMuted';
+        } 
+        return newWidth;
+       };
+    return VolumeControl;
+}();
+    control = new VolumeControl();
+
+</script>
+
+</body>
+</html>
